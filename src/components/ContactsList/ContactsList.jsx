@@ -1,13 +1,23 @@
-import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
-import { getFilter, getContacts } from 'redux/selectors';
-import { deleteContact } from 'redux/contacts/contactsSlice';
+import { useEffect } from 'react';
+import {
+  selectFilter, selectContacts, selectIsLoading, selectError
+} from 'redux/selectors';
+import { fetchContacts, deleteContact } from 'redux/operations';
 
 
 const ContactsList = () => {
-  const contacts = useSelector(getContacts);
-  const filter = useSelector(getFilter);
   const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
+  const filter = useSelector(selectFilter);
+  const isLoading = useSelector(selectIsLoading);
+  const error = useSelector(selectError);
+
+  useEffect(() => {
+    console.log('useEffect: ');
+
+    dispatch(fetchContacts)
+  }, [dispatch]);
 
   const findContact = () => {
     return contacts.filter(contact => {
@@ -17,16 +27,18 @@ const ContactsList = () => {
     });
   };
   const foundContacts = findContact()
+  const deleteHandler = id => { dispatch(deleteContact(id)) }
 
   return (
     <ul >
+      {isLoading && !error && <p>Loading ...</p>}
       {foundContacts.map(({ id, name, number }) => (
         <li key={id} >
           <span >{name}: </span>
           <span >{number} </span>
           <button
             type="button"
-            onClick={() => dispatch(deleteContact(id))}
+            onClick={() => deleteHandler(id)}
           >
             Delete
           </button>
@@ -34,12 +46,5 @@ const ContactsList = () => {
       ))}
     </ul>)
 };
-
-ContactsList.propTypes = {
-  id: PropTypes.string,
-  name: PropTypes.string,
-  number: PropTypes.string,
-  deleteContact: PropTypes.func
-}
 
 export default ContactsList;

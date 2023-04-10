@@ -1,34 +1,34 @@
 import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
-import { nanoid } from 'nanoid';
-import { addContact } from 'redux/contacts/contactsSlice';
-import { getContacts } from 'redux/selectors';
+import { addContact } from 'redux/operations';
+import { selectContacts } from 'redux/selectors';
 
 
 export default function ContactsForm() {
   const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+  const [phone, setPhone] = useState('');
 
-  const contacts = useSelector(getContacts);
+  const contacts = useSelector(selectContacts);
   const dispatch = useDispatch();
 
-  const handleChange = ({ currentTarget: { name, value } }) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
     switch (name) {
       case 'name':
         setName(value);
         break;
-      case 'number':
-        setNumber(value);
+      case 'phone':
+        setPhone(value);
         break;
-      default:
+      default: return;
     }
   };
 
-  const formSubmit = ({ name, number }) => {
-    const contact = {
-      id: nanoid(),
+  const formSubmit = (e) => {
+    e.preventDefault();
+    const data = {
       name,
-      number,
+      phone,
     };
 
     const isHaveDublicateName = contacts.find(
@@ -39,18 +39,15 @@ export default function ContactsForm() {
       alert(`${name} is already in contacts`)
       return;
     }
-    dispatch(addContact(contact));
+
+    dispatch(addContact(data));
+    setName('');
+    setPhone('');
   };
 
-  const handleSubmit = e => {
-    e.preventDefault();
-    formSubmit({ name, number });
-    setName('');
-    setNumber('');
-  };
   return (
     <div>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={formSubmit}>
         <label>
           Name
           <input
@@ -67,8 +64,8 @@ export default function ContactsForm() {
           Number
           <input
             type="tel"
-            name="number"
-            value={number}
+            name="phone"
+            value={phone}
             onChange={handleChange}
             pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
             title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"

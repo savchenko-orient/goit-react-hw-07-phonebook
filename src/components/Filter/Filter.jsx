@@ -1,20 +1,19 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { filterContacts } from 'redux/filter/filterSlice';
-import { getContacts, getFilter } from 'redux/selectors';
+import { setFilterContacts } from 'redux/filter/filterSlice';
+import { selectContacts, selectFilter } from 'redux/selectors';
 
 const Filter = () => {
   const dispatch = useDispatch();
-  const contacts = useSelector(getContacts);
-  const filterValue = useSelector(getFilter);
+  const contacts = useSelector(selectContacts);
+  const filter = useSelector(selectFilter);
   const contactsCount = contacts.length;
 
   const changeFilter = e => {
-    console.log('e.target.value: ', e.target.value);
-    dispatch(filterContacts(e.target.value))
+    dispatch(setFilterContacts(e.target.value.toLowerCase()))
   };
 
   return (
-    <form >
+    <form>
       <div>
         <p >Total contacts: <span >{contactsCount}</span></p>
       </div>
@@ -23,14 +22,12 @@ const Filter = () => {
         <input
           type="text"
           name='filter'
-          value={filterValue}
+          value={filter}
           onChange={changeFilter}
         />
       </label>
     </form>
   )
 };
-
-
 
 export default Filter;
