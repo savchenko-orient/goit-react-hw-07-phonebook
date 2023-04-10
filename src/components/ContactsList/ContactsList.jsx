@@ -1,41 +1,25 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { useEffect } from 'react';
-import {
-  selectFilter, selectContacts, selectIsLoading, selectError
-} from 'redux/selectors';
-import { fetchContacts, deleteContact } from 'redux/operations';
+import { selectFilter, selectContacts } from 'redux/selectors';
+import { deleteContact } from 'redux/operations';
 
 
 const ContactsList = () => {
   const dispatch = useDispatch();
   const contacts = useSelector(selectContacts);
   const filter = useSelector(selectFilter);
-  const isLoading = useSelector(selectIsLoading);
-  const error = useSelector(selectError);
 
-  useEffect(() => {
-    console.log('useEffect: ');
-
-    dispatch(fetchContacts)
-  }, [dispatch]);
-
-  const findContact = () => {
-    return contacts.filter(contact => {
-      return contact.name
-        .toLowerCase()
-        .includes(filter);
-    });
+  const findContact = (contacts) => {
+    return contacts.filter(contact => contact.name.toLowerCase().includes(filter));
   };
-  const foundContacts = findContact()
+  const foundContacts = findContact(contacts)
   const deleteHandler = id => { dispatch(deleteContact(id)) }
 
   return (
     <ul >
-      {isLoading && !error && <p>Loading ...</p>}
-      {foundContacts.map(({ id, name, number }) => (
+      {foundContacts.length > 0 && foundContacts.map(({ id, name, phone }) => (
         <li key={id} >
           <span >{name}: </span>
-          <span >{number} </span>
+          <span >{phone} </span>
           <button
             type="button"
             onClick={() => deleteHandler(id)}
